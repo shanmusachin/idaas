@@ -1,7 +1,7 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const keys = require('./keys');
-const User = require('../models/user-model');
+const User = require('../../models/user-model');
 
 passport.serializeUser((user, done) => {
     done(null, user.id);
@@ -21,21 +21,31 @@ passport.use(
         callbackURL: '/auth/google/redirect'
     }, (accessToken, refreshToken, profile, done) => {
         // check if user already exists in our own db
-        User.findOne({googleId: profile.id}).then((currentUser) => {
+        User.findOne({username: profile.displayName}).then((currentUser) => {
             if(currentUser){
                 // already have this user
                 console.log('user is: ', currentUser);
                 done(null, currentUser);
             } else {
                 // if not, create user in our db
-                new User({
-                    googleId: profile.id,
+                var user = new User({
                     username: profile.displayName,
-                    thumbnail: profile._json.image.url
-                }).save().then((newUser) => {
+                    thumbnail: profile._json.image.url}
+                );
+                user.providers.push({
+                    type:"Google",                    
+                    profileId:profile.id
+                })
+                var subdoc = user.providers[0];
+                console.log(subdoc) // { _id: '501d86090d371bab2c0341c5', name: 'Liesl' }
+                subdoc.isNew;
+
+                console.log('new user: ', user); 
+                user.save().then((newUser) => {
                     console.log('created new user: ', newUser);
                     done(null, newUser);
                 });
+
             }
         });
     })

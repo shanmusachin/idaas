@@ -3,14 +3,16 @@ const cookieSession = require('cookie-session');
 const passport = require('passport');
 const authRoutes = require('./routes/auth-routes');
 const profileRoutes = require('./routes/profile-routes');
-const passportSetup = require('./config/passport-setup');
+const passportSetup = require('./config/common/passport-setup');
 const mongoose = require('mongoose');
-const keys = require('./config/keys');
+const keys = require('./config/common/keys');
 
 const app = express();
 
 // set view engine
 app.set('view engine', 'ejs');
+app.use('/static', express.static('assets'))
+app.use('/auth/static', express.static('assets'))
 
 // set up session cookies
 app.use(cookieSession({

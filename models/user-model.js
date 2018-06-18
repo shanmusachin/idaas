@@ -1,9 +1,13 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-
+const providerSchema = new Schema({
+	    type: String,
+    	profileId:String
+});
 const userSchema = new Schema({
     username: String,
-    googleId: String,
+    password: String,
+    providers: [providerSchema],
     thumbnail: String
 });
 
